@@ -1,0 +1,16 @@
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+Button	KEYWORD1
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+getStatus	KEYWORD2
+###########################################
+# Constants (LITERAL1)
+###########################################
+BUTTON_STATUS	LITERAL1
+BUTTON_NONE	LITERAL1
+BUTTON_SHORT	LITERAL1
+BUTTON_LONG	LITERAL1
+BUTTON_AUTO	LITERAL1
