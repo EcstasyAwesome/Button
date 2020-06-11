@@ -11,6 +11,8 @@ typedef enum {
 
 class Button {
   private:
+    bool _state;
+    bool _digital;
     bool _pressed;
     bool _longPressed;
     bool _autoPressed;
@@ -23,7 +25,9 @@ class Button {
     uint16_t _interval;
     uint32_t _time;
   public:
-    Button(const uint8_t pin, const uint16_t value, const uint16_t tm1 = 0, const uint16_t tm2 = 0, const uint16_t tm3 = 0, const uint8_t tm4 = 100);
+    Button(const uint8_t pin, const uint16_t min, const uint16_t max, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4);
+	Button(const uint8_t pin, const bool state, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4);
+	Button(const uint8_t pin, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4);
     BUTTON_STATUS getStatus();
 };
 

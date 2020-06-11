@@ -1,28 +1,88 @@
 #include "Button.h"
 
 /*
+ * Use this constructor if a button is connected to an analog pin
+ * Using min/max values can be useful because sometimes the real button value can be different than value was declared by the user
+ *
  * @param pin
  *        pin number that a buttom is connected
- * @param value
- *        button value that a button is pressed
+ * @param min
+ *        button min value that a button is pressed
+ * @param max
+ *        button max value that a button is pressed
  * @param tm1
- *        long pushing time (ms), if 0 - disable (default is 0)
+ *        long pushing time (ms), if 0 - disable
  * @param tm2
- *        auto pushing time (ms), if 0 - disable (default is 0)
+ *        auto pushing time (ms), if 0 - disable
  * @param tm3
- *        time (ms) between auto pushing (default is 0)
+ *        time (ms) between auto pushing, if tm2 is disabled tm3 is ignored
  * @param tm4
- *        debounce time (ms) (default is 100)
+ *        debounce time (ms)
  */
 
-Button::Button(const uint8_t pin, const uint16_t value, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4) {
+Button::Button(const uint8_t pin, const uint16_t min, const uint16_t max, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4) {
   _pin = pin;
-  _min = (value <= 23) ? 0 : (value - 23);
-  _max = (value >= 1000) ? 1023 : (value + 23);
+  _min = min;
+  _max = max;
   _long = tm1;
   _auto = tm2;
   _interval = tm3;
   _debounce = tm4;
+  _digital = false;
+}
+
+/*
+ * Use this constructor if a button is connected to a digital pin
+ *
+ * @param pin
+ *        pin number that a buttom is connected
+ * @param state
+ *        pin state when the button is pressed (HIGH/true or LOW/false)
+ * @param tm1
+ *        long pushing time (ms), if 0 - disable
+ * @param tm2
+ *        auto pushing time (ms), if 0 - disable
+ * @param tm3
+ *        time (ms) between auto pushing, if tm2 is disabled tm3 is ignored
+ * @param tm4
+ *        debounce time (ms)
+ */
+
+Button::Button(const uint8_t pin, const bool state, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4) {
+  _pin = pin;
+  _long = tm1;
+  _auto = tm2;
+  _interval = tm3;
+  _debounce = tm4;
+  _digital = true;
+  _state = state;
+  pinMode(_pin, INPUT);
+}
+
+/*
+ * Use this constructor if a button is connected to a digital pin, using an inner pull-up resistor
+ *
+ * @param pin
+ *        pin number that a buttom is connected
+ * @param tm1
+ *        long pushing time (ms), if 0 - disable
+ * @param tm2
+ *        auto pushing time (ms), if 0 - disable
+ * @param tm3
+ *        time (ms) between auto pushing, if tm2 is disabled tm3 is ignored
+ * @param tm4
+ *        debounce time (ms)
+ */
+
+Button::Button(const uint8_t pin, const uint16_t tm1, const uint16_t tm2, const uint16_t tm3, const uint8_t tm4) {
+  _pin = pin;
+  _long = tm1;
+  _auto = tm2;
+  _interval = tm3;
+  _debounce = tm4;
+  _digital = true;
+  _state = false;
+  pinMode(_pin, INPUT_PULLUP);
 }
 
 /*
@@ -31,8 +91,13 @@ Button::Button(const uint8_t pin, const uint16_t value, const uint16_t tm1, cons
  */
 
 BUTTON_STATUS Button::getStatus() {
-  uint16_t value = analogRead(_pin);
-  if (value < _max && value >= _min) {
+  bool physicallyPressed;
+  if (_digital) physicallyPressed = _state ? digitalRead(_pin) : !digitalRead(_pin);
+  else {
+  	uint16_t value = analogRead(_pin);
+	physicallyPressed = value <= _max && value >= _min;
+  }
+  if (physicallyPressed) {
     if (!_pressed) {
       if (millis() - _time >= _debounce) {
         _pressed = true;
