@@ -1,6 +1,13 @@
 #include <Button.h>
 
-Button button(A0, 0, 1000, 2000, 500);
+// analog button
+Button button(A0, 0, 10, 1000, 2000, 500, 100);
+
+// digital button
+//Button button(2, HIGH, 1000, 2000, 500, 100);
+
+// digital button with inner pull-up resistor
+//Button button(2, 1000, 2000, 500, 100);
 
 void setup() {
   Serial.begin(9600);
